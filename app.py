@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-
+from handlers.handlers import *
 
 def load_data():
     data = None
@@ -11,27 +11,37 @@ def load_data():
         st.write(data)
     return data
 
-def call_naratives():
-    generate_narrative=st.button("generate the narative", type="primary")
-    st.write(generate_narrative)
-    return generate_narrative
+def call_naratives(data):
+    generate_narrative_button = st.button("generate the narative", type="primary")
+    if generate_narrative_button == True:
+        narratives_df = generate_narrative(data)
+        st.write(narratives_df.iloc[0][1])
+        return narratives_df
 
-def call_email():
-    generate_email=st.button("generate the email", type="primary")
-    st.write(generate_email)
-    return generate_email
+def call_email(narratives_df):
+    generate_email_botton=st.button("generate the email", type="primary")
+    if generate_email_botton==True:
+        generated_email = generate_email(narratives_df)
+        st.write(generated_email.iloc[0][1])
+        return generated_email
 
+if "data" not in st.session_state:
+    st.session_state.data = None
+if "narratives_df" not in st.session_state:
+    st.session_state.narratives_df = None
+if "generated_email" not in st.session_state:
+    st.session_state.generated_email = None
 
+if st.session_state.data is None:
+    st.session_state.data = load_data()
 
-# def customerID_call():
-#     select_id=st.text_input('enter a customer_ID')
-#     return select_id
+if st.session_state.data is not None:
+    if st.session_state.narratives_df is None:
+        st.session_state.narratives_df= call_naratives(st.session_state.data)
 
-data = load_data()
-if data is not None:
-    generate_narrative= call_naratives()
-    if generate_narrative==True:
-        generate_email=call_email()
+if st.session_state.narratives_df is not None:
+    if st.session_state.generated_email is None:
+        st.session_state.generated_email=call_email(st.session_state.narratives_df)
 
 
 
