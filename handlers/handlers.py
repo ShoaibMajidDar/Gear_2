@@ -1,8 +1,9 @@
 from langchain.agents.agent_types import AgentType
 from langchain_experimental.agents.agent_toolkits import create_pandas_dataframe_agent
-from langchain_openai import ChatOpenAI
+from langchain_openai import ChatOpenAI, OpenAI
 from langchain_core.prompts import ChatPromptTemplate
 import pandas as pd
+import copy
 
 import os
 from dotenv import load_dotenv, dotenv_values 
@@ -36,3 +37,18 @@ def generate_email(narratives_df):
         res = chain.invoke({"input": row[1]})
         email_df = pd.concat([email_df,pd.DataFrame({"customer_id":str(i+1), "email_generated":res.content}, index=[i])])
     return email_df
+
+def generate_recommendation_for_customerInteraction(df):
+    df_preds = copy.deepcopy(df)
+    agent = create_pandas_dataframe_agent(OpenAI(temperature=0), df_preds, verbose=True)
+    prompt_labels = """Generate a column which will be used as label to create categorized Machine Learning problem used case and suggest the best algorithms to use in solving the machine learning problem of giving personilized advice by an RM(relationship manager).
+    Label Column:
+    Investment Strategy Recommendation: Indicates advice related to optimizing investment strategies based on client goals, risk tolerance, and market conditions.
+    Retirement Planning Advice: Indicates advice tailored to retirement planning, including retirement savings, income planning, and retirement account management.
+    Estate Planning Guidance: Indicates advice focused on estate planning, including wealth transfer, wills, trusts, and estate tax strategies.
+    Education Savings Recommendations: Indicates advice related to education savings planning, such as 529 plans, education savings accounts, and investment options for college savings.
+    Insurance Coverage Suggestions: Indicates advice regarding insurance coverage, including life insurance, health insurance, disability insurance, and long-term care insurance.
+    Tax Planning Strategies: Indicates advice on tax planning strategies, including tax-efficient investment strategies, retirement account contributions, and tax deductions.
+    """
+    res = agent.invoke(prompt_labels)
+    return df_preds
