@@ -24,6 +24,14 @@ def call_email(narratives_df):
         generated_email = generate_email(narratives_df)
         st.write(generated_email.iloc[0][1])
         return generated_email
+    
+def generate_recommendations(data):
+    generate_recommendations_button=st.button("generate recommendations for the customer Interaction",type="primary")
+    if generate_recommendations_button==True:
+        generate_recommendations=generate_recommendations(data)
+        st.write(generate_recommendations[-1])
+        return generate_recommendations
+        
 
 if "data" not in st.session_state:
     st.session_state.data = None
@@ -31,6 +39,9 @@ if "narratives_df" not in st.session_state:
     st.session_state.narratives_df = None
 if "generated_email" not in st.session_state:
     st.session_state.generated_email = None
+
+if "generate_recommendations" not in st.session_state:
+    st.session_state.generated_recommendations =None
 
 if st.session_state.data is None:
     st.session_state.data = load_data()
@@ -43,6 +54,9 @@ if st.session_state.narratives_df is not None:
     if st.session_state.generated_email is None:
         st.session_state.generated_email=call_email(st.session_state.narratives_df)
 
+if st.session_state.generated_email is not None:
+    if st.session_state.generated_recommendations is None:
+        st.session_state.generated_recommendations=generate_recommendations(st.session_state.data)
 
 
    
