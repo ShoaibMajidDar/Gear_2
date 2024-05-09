@@ -38,7 +38,7 @@ def generate_email(narratives_df):
         email_df = pd.concat([email_df,pd.DataFrame({"customer_id":str(i+1), "email_generated":res.content}, index=[i])])
     return email_df
 
-def generate_recommendation_for_customerInteraction(df):
+def generate_recommendation_for_customer_interaction(df):
     df_preds = copy.deepcopy(df)
     agent = create_pandas_dataframe_agent(OpenAI(temperature=0), df_preds, verbose=True)
     prompt_labels = """Generate a column which will be used as label to create categorized Machine Learning problem used case and suggest the best algorithms to use in solving the machine learning problem of giving personilized advice by an RM(relationship manager).

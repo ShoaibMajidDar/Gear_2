@@ -28,7 +28,7 @@ def call_email(narratives_df):
 def generate_recommendations(data):
     generate_recommendations_button=st.button("generate recommendations for the customer Interaction",type="primary")
     if generate_recommendations_button==True:
-        generated_recommendations=generate_recommendation_for_customerInteraction(data)
+        generated_recommendations=generate_recommendation_for_customer_interaction(data)
         st.write(generated_recommendations)
         return generated_recommendations
         
