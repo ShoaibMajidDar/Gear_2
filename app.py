@@ -8,13 +8,13 @@ def load_data():
     uploaded_file = st.file_uploader("upload customer details")
     if uploaded_file is not None:
         data = pd.read_excel(uploaded_file)
-        st.write(data)
+        st.table(data)
     return data
 
-def call_naratives(data):
+def call_naratives(data, selected_id):
     generate_narrative_button = st.button("generated narratives", type="primary")
     if generate_narrative_button == True:
-        narratives_df = generate_narrative(data)
+        narratives_df = generate_narrative(data, selected_id)
         return narratives_df
 
 def call_email(narratives_df):
@@ -23,27 +23,27 @@ def call_email(narratives_df):
         generated_email = generate_email(narratives_df)
         return generated_email
     
-def generate_recommendations(data):
+def generate_recommendations(data, selected_id):
     generate_recommendations_button=st.button("generate recommendations for the customer Interaction",type="primary")
     if generate_recommendations_button==True:
-        generated_recommendations=generate_recommendation_for_customerInteraction(data)
-        st.write(generated_recommendations)
-        return generated_recommendations
+        generated_recommendations=generate_recommendation_for_customerInteraction(data, selected_id)
+        single_customer = data.iloc[selected_id]
+        single_customer['label'] = generated_recommendations.split(":")[1]
+        
+        return single_customer
     
 def another_excel():
-    data1=None
     uploaded_file1 = st.file_uploader("upload customer advisory details")
     if uploaded_file1 is not None:
         data1 = pd.read_excel(uploaded_file1)
-        st.write(data1)
-    return data1
+        return data1
 
-def generate_recommendations_for_another_excel(data1):
-    generate_recommendations_for_another_excel_button=st.button("generate recommendations for the customer advisory details",type="primary")
-    if generate_recommendations_for_another_excel==True:
-        generated_recommendations1=generate_recommendations_for_another_excel(data1)
-        st.write(generated_recommendations1)
-        return generated_recommendations1
+# def generate_recommendations_for_another_excel(data1):
+#     generate_recommendations_for_another_excel_button=st.button("generate recommendations for the customer advisory details",type="primary")
+#     if generate_recommendations_for_another_excel==True:
+#         generated_recommendations1=generate_recommendations_for_another_excel(data1)
+#         st.write(generated_recommendations1)
+#         return generated_recommendations1
 
 
         
@@ -59,12 +59,12 @@ if "option" not in st.session_state:
 
 if "generated_email" not in st.session_state:
     st.session_state.generated_email = None
-if "generate_recommendations" not in st.session_state:
+if "generated_recommendations" not in st.session_state:
     st.session_state.generated_recommendations =None
-if "another_excel" not in st.session_state:
+if "data1" not in st.session_state:
     st.session_state.data1=None
 if "generate_recommendations_for_another_excel" not in st.session_state:
-    st.session_state.generate_recommendations1=None
+    st.session_state.generate_recommendations_for_another_excel=None
 
 if st.session_state.data is None:
     st.session_state.data = load_data()
@@ -72,47 +72,46 @@ if st.session_state.data is None:
 if st.session_state.data is not None:
     if st.session_state.narratives_df is None:
         st.session_state.option=st.selectbox('Select the customer for Generating narratives:', ('customer 1', 'customer 2', 'customer 3') )
+        if st.session_state.option is not None:
+            st.session_state.selected_id=int(st.session_state.option.split(" ")[1])-1
+
         with st.spinner('generating narratives...'):
-            st.session_state.narratives_df = call_naratives(st.session_state.data)
+            st.session_state.narratives_df = call_naratives(st.session_state.data, st.session_state.selected_id)
 
 if st.session_state.narratives_df is not None:
-        st.success('Done! Narratives Generated.')
-        st.write(st.session_state.narratives_df)
-
-
-if st.session_state.narratives_df is not None:
-    if st.session_state.option:
-        st.session_state.selected_id=int(st.session_state.option.split(" ")[1])
-        st.session_state.selected_row=(st.session_state.narratives_df.iloc[st.session_state.selected_id-1])
-        st.write(st.session_state.selected_row[1])
-       
+    st.success('Done! Narratives Generated.')
+    st.write(st.session_state.narratives_df.iloc[0][1])
 
 if st.session_state.narratives_df is not None:
     if st.session_state.generated_email is None:
         with st.spinner('generating emails...'):
-            generated_email= call_email(st.session_state.narratives_df)
-            st.session_state.generated_email = generated_email
+            st.session_state.generated_email= call_email(st.session_state.narratives_df)
 
 if st.session_state.generated_email is not None:
-        st.success('Done! email Generated.')
-        st.write(st.session_state.generated_email)
-        
+    st.success('Done! email Generated.')
+    st.write(st.session_state.generated_email.iloc[0][1])
 
 if st.session_state.generated_email is not None:
     st.write(st.session_state.selected_row)
 
 if st.session_state.generated_email is not None:
     if st.session_state.generated_recommendations is None:
-        st.session_state.generated_recommendations=generate_recommendations(st.session_state.data)
+        st.session_state.generated_recommendations=generate_recommendations(st.session_state.data, st.session_state.selected_id)
 
+if st.session_state.generated_recommendations is not None:   
+   st.table(st.session_state.generated_recommendations)
+   
 
 if st.session_state.generated_recommendations is not None:   
     if st.session_state.data1 is None:
-        st.session_state.another_excel=another_excel()
+        st.session_state.data1=another_excel()
+
 
 if st.session_state.data1 is not None:
-    if st.session_state.generate_recommendations1 is None:
-        st.session_state.generate_recommendations_for_another_excel=generate_recommendations_for_another_excel()
+    st.table(st.session_state.data1)
+# if st.session_state.data1 is not None:
+#     if st.session_state.generate_recommendations1 is None:
+#         st.session_state.generate_recommendations_for_another_excel=generate_recommendations_for_another_excel()
 
 
 
