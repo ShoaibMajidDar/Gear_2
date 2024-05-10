@@ -29,7 +29,6 @@ def generate_recommendations(data, selected_id):
         generated_recommendations=generate_recommendation_for_customerInteraction(data, selected_id)
         single_customer = data.iloc[selected_id]
         single_customer['label'] = generated_recommendations.split(":")[1]
-        
         return single_customer
     
 def another_excel():
@@ -91,8 +90,6 @@ if st.session_state.generated_email is not None:
     st.success('Done! email Generated.')
     st.write(st.session_state.generated_email.iloc[0][1])
 
-if st.session_state.generated_email is not None:
-    st.write(st.session_state.selected_row)
 
 if st.session_state.generated_email is not None:
     if st.session_state.generated_recommendations is None:
