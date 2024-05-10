@@ -31,10 +31,9 @@ def generate_email(narratives_df):
         ("user", "{input}")
     ])
     chain = prompt | llm
-    email_df = pd.DataFrame()
-    for i,row in narratives_df.iterrows():
-        res = chain.invoke({"input": row[1]})
-        email_df = pd.concat([email_df,pd.DataFrame({"customer_id":str(i+1), "email_generated":res.content}, index=[i])])
+    row = narratives_df.iloc[0]
+    res = chain.invoke({"input": row})
+    email_df = pd.DataFrame({"customer_id":str(0), "email_generated":res.content}, index=[0])
     return email_df
 
 
