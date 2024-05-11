@@ -32,7 +32,7 @@ def generate_email(narratives_df):
     ])
     chain = prompt | llm
     row = narratives_df.iloc[0]
-    res = chain.invoke({"input": row})
+    res = chain.invoke({"input": row[1]})
     email_df = pd.DataFrame({"customer_id":str(0), "email_generated":res.content}, index=[0])
     return email_df
 

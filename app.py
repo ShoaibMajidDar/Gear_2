@@ -99,13 +99,13 @@ if st.session_state.generated_recommendations is not None:
    st.table(st.session_state.generated_recommendations)
    
 
-if st.session_state.generated_recommendations is not None:   
-    if st.session_state.data1 is None:
-        st.session_state.data1=another_excel()
+# if st.session_state.generated_recommendations is not None:   
+#     if st.session_state.data1 is None:
+#         st.session_state.data1=another_excel()
 
 
-if st.session_state.data1 is not None:
-    st.table(st.session_state.data1)
+# if st.session_state.data1 is not None:
+#     st.table(st.session_state.data1)
 # if st.session_state.data1 is not None:
 #     if st.session_state.generate_recommendations1 is None:
 #         st.session_state.generate_recommendations_for_another_excel=generate_recommendations_for_another_excel()
