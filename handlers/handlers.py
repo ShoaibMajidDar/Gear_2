@@ -12,29 +12,45 @@ load_dotenv()
 os.environ['OPENAI_API_KEY'] = os.getenv("OPENAI_API_KEY")
 
 def generate_narrative(df, customer_id):
-    llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo-0613", verbose = True)
+    llm = ChatOpenAI(temperature=0.7, model="gpt-3.5-turbo-0613", verbose = True)
     prompt = ChatPromptTemplate.from_messages([
-        ("system", """Can you generate LLM narrative to identify opportunities to deepen customer relationships, tailor services to individual needs, and anticipate customer needs proactively. The narratives must analyze customer interactions, preferences, and behavior patterns to provide personalized recommendations and anticipate future requirements effectively."""),
-        ("user", "here are the details of the customer {input}")
+        ("system", """
+        During the recent investment portfolio review meeting with Customer, the following data was generated
+        {input}. 
+        Based on the info, generate a very short summary on the customer and if and how their behavior and preferences align.
+        Also give in great detailed on how we can deepen client relationships, tailor services to individual needs, 
+        and anticipate client needs proactively.
+        """),
+        ("user", "")
     ])
     chain =  prompt | llm
     df1 = pd.DataFrame()
-    row = df.iloc[customer_id]
-    response = chain.invoke(row)
+    row = copy.deepcopy(df.iloc[1])
+    row["Preference"] = row["Preference 1"]+row["Preference 2"]+row["Preference 3"]
+    
+    row["Behavior Patterns"] = row['Behavior Pattern 1']+row['Behavior Pattern 2']
+    
+    row_n = row[["Product/Service","Feedback","Preference","Behavior Patterns"]]
+    
+    response = chain.invoke(row_n)
     df1 = pd.DataFrame({"customer_id":str(customer_id), "narrative":response.content}, index=[0])
     return df1
 
 def generate_email(narratives_df):
     llm = ChatOpenAI()
     prompt = ChatPromptTemplate.from_messages([
-        ("system", " Generate an emails for Customer based on above narratives to provide recommendations as bullet points."),
-        ("user", "{input}")
+        ("system", """
+        generate an email to the customer which provides recommendations to the user as bullet points,
+        given the narrative of a customer that were generated during the last interaction with the customer.
+         """),
+        ("user", """{narrative}""")
     ])
     chain = prompt | llm
     row = narratives_df.iloc[0]
-    res = chain.invoke({"input": row[1]})
+    res = chain.invoke({"narrative": row[1]})
     email_df = pd.DataFrame({"customer_id":str(0), "email_generated":res.content}, index=[0])
     return email_df
+
 
 
 def generate_recommendation_for_customerInteraction(df, selected_id):
